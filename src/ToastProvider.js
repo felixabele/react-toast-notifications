@@ -62,6 +62,8 @@ type Props = {
   // A convenience prop; the duration of the toast transition, in milliseconds.
   // Note that specifying this will override any defaults set on individual children Toasts.
   transitionDuration: number,
+  // force disabling rendering
+  preventRendering: Boolean,
 };
 type State = { toasts: ToastsType };
 type Context = {
@@ -169,17 +171,19 @@ export class ToastProvider extends Component<Props, State> {
       placement,
       portalTargetSelector,
       transitionDuration,
+      preventRendering,
     } = this.props;
     const { Toast, ToastContainer } = { ...defaultComponents, ...components };
     const { add, remove, removeAll, update } = this;
     const toasts = Object.freeze(this.state.toasts);
 
     const hasToasts = Boolean(toasts.length);
-    const portalTarget = canUseDOM
-      ? portalTargetSelector
-        ? document.querySelector(portalTargetSelector)
-        : document.body
-      : null; // appease flow
+    const portalTarget =
+      !preventRendering && canUseDOM
+        ? portalTargetSelector
+          ? document.querySelector(portalTargetSelector)
+          : document.body
+        : null; // appease flow
 
     return (
       <Provider value={{ add, remove, removeAll, update, toasts }}>
